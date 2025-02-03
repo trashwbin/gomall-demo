@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/trashwbin/gomall-demo/demo/demo_proto/biz/service"
+	"github.com/trashwbin/gomall-demo/demo/demo_proto/kitex_gen/pbapi"
 )
 
 // EchoImpl implements the last service interface defined in the IDL.
