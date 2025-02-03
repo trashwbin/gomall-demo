@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	consul "github.com/kitex-contrib/registry-consul"
+	"github.com/trashwbin/gomall-demo/demo/demo_proto/biz/dal"
 	"log"
 	"net"
 	"time"
@@ -17,11 +19,17 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		panic(err)
+	}
+	dal.Init()
 	opts := kitexInit()
 
 	svr := echo.NewServer(new(EchoImpl), opts...)
 
-	err := svr.Run()
+	err = svr.Run()
 	if err != nil {
 		klog.Error(err.Error())
 	}

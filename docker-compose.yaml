@@ -4,3 +4,11 @@ services:
     image: 'hashicorp/consul'
     ports:
       - 8500:8500
+#  mysql:
+#    image: 'mysql:8.0.32'
+#    ports:
+#      - 3306:3306
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#      - MYSQL_DATABASE=demo_proto
+#我的mysql是在本地的，所以这里注释掉
