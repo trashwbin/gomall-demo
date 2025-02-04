@@ -4,4 +4,5 @@ use (
 	.
 	./demo/demo_proto
 	hello_world
+	app/frontend
 )
