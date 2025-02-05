@@ -47,6 +47,8 @@ type Hertz struct {
 	LogMaxSize      int    `yaml:"log_max_size"`
 	LogMaxBackups   int    `yaml:"log_max_backups"`
 	LogMaxAge       int    `yaml:"log_max_age"`
+	// 注册中心地址
+	RegistryAddr string `yaml:"registry_addr"`
 }
 
 // GetConf gets configuration instance

@@ -12,3 +12,7 @@ services:
 #      - MYSQL_ROOT_PASSWORD=root
 #      - MYSQL_DATABASE=demo_proto
 #我的mysql是在本地的，所以这里注释掉
+  redis:
+    image: "redis:6.2"
+    ports:
+      - 6379:6379

@@ -3,6 +3,8 @@ go 1.23.4
 use (
 	.
 	./demo/demo_proto
-	hello_world
 	app/frontend
+	hello_world
+	rpc_gen
+	app/user
 )
