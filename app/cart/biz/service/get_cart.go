@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/trashwbin/gomall-demo/app/cart/biz/dal/mysql"
+	"github.com/trashwbin/gomall-demo/app/cart/biz/model"
 	cart "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart"
 )
 
@@ -15,6 +18,16 @@ func NewGetCartService(ctx context.Context) *GetCartService {
 // Run create note info
 func (s *GetCartService) Run(req *cart.GetCartReq) (resp *cart.GetCartResp, err error) {
 	// Finish your business logic.
-
-	return
+	list, err := model.GetCartByUserId(s.ctx, mysql.DB, req.UserId)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(50002, err.Error())
+	}
+	var items []*cart.CartItem
+	for _, item := range list {
+		items = append(items, &cart.CartItem{
+			ProductId: item.ProductId,
+			Quantity:  item.Qty,
+		})
+	}
+	return &cart.GetCartResp{Items: items}, nil
 }

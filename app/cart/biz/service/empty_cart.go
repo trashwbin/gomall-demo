@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/kitex/pkg/kerrors"
+	"github.com/trashwbin/gomall-demo/app/cart/biz/dal/mysql"
+	"github.com/trashwbin/gomall-demo/app/cart/biz/model"
 	cart "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart"
 )
 
@@ -15,6 +18,9 @@ func NewEmptyCartService(ctx context.Context) *EmptyCartService {
 // Run create note info
 func (s *EmptyCartService) Run(req *cart.EmptyCartReq) (resp *cart.EmptyCartResp, err error) {
 	// Finish your business logic.
-
-	return
+	err = model.EmptyCart(s.ctx, mysql.DB, req.UserId)
+	if err != nil {
+		return nil, kerrors.NewBizStatusError(50001, err.Error())
+	}
+	return &cart.EmptyCartResp{}, nil
 }

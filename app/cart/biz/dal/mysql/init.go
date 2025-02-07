@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"github.com/trashwbin/gomall-demo/app/cart/biz/model"
 	"github.com/trashwbin/gomall-demo/app/cart/conf"
 	"os"
 
@@ -25,5 +26,11 @@ func Init() {
 	)
 	if err != nil {
 		panic(err)
+	}
+	if os.Getenv("GO_ENV") != "online" {
+		err = DB.AutoMigrate(&model.Cart{})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
