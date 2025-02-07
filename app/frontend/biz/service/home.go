@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/common"
+	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -21,25 +24,13 @@ func NewHomeService(Context context.Context, RequestContext *app.RequestContext)
 
 // Run 处理首页逻辑并返回响应内容
 func (h *HomeService) Run(req *common.Empty) (map[string]any, error) {
-	// 创建一个响应映射
-	var resp = make(map[string]any)
-
-	// 定义首页显示的商品列表
-	items := []map[string]any{
-		{"Name": "T-shirt-1", "Price": 100, "Picture": "/static/image/t-shirt-1.jpeg"},
-		{"Name": "T-shirt-2", "Price": 110, "Picture": "/static/image/t-shirt-1.jpeg"},
-		{"Name": "T-shirt-3", "Price": 120, "Picture": "/static/image/t-shirt-2.jpeg"},
-		{"Name": "T-shirt-4", "Price": 130, "Picture": "/static/image/notebook.jpeg"},
-		{"Name": "T-shirt-5", "Price": 140, "Picture": "/static/image/t-shirt-1.jpeg"},
-		{"Name": "T-shirt-6", "Price": 150, "Picture": "/static/image/t-shirt.jpeg"},
+	products, err := rpc.ProductClient.ListProducts(h.Context, &product.ListProductsReq{})
+	if err != nil {
+		return nil, err
 	}
 
-	// 设置响应中的标题
-	resp["title"] = "Hot Sales"
-
-	// 设置响应中的商品列表
-	resp["items"] = items
-
-	// 返回响应内容和错误（如果有的话）
-	return resp, nil
+	return utils.H{
+		"title": "Hot sale",
+		"items": products.Products,
+	}, nil
 }

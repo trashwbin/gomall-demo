@@ -2,22 +2,23 @@ package user
 
 import (
 	"context"
-	user "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/user"
-	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/user/userservice"
+	cart "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart"
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart/cartservice"
 
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/client/callopt"
 )
 
 type RPCClient interface {
-	KitexClient() userservice.Client
+	KitexClient() cartservice.Client
 	Service() string
-	Register(ctx context.Context, Req *user.RegisterReq, callOptions ...callopt.Option) (r *user.RegisterResp, err error)
-	Login(ctx context.Context, Req *user.LoginReq, callOptions ...callopt.Option) (r *user.LoginResp, err error)
+	AddItem(ctx context.Context, Req *cart.AddItemReq, callOptions ...callopt.Option) (r *cart.AddItemResp, err error)
+	GetCart(ctx context.Context, Req *cart.GetCartReq, callOptions ...callopt.Option) (r *cart.GetCartResp, err error)
+	EmptyCart(ctx context.Context, Req *cart.EmptyCartReq, callOptions ...callopt.Option) (r *cart.EmptyCartResp, err error)
 }
 
 func NewRPCClient(dstService string, opts ...client.Option) (RPCClient, error) {
-	kitexClient, err := userservice.NewClient(dstService, opts...)
+	kitexClient, err := cartservice.NewClient(dstService, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -31,21 +32,25 @@ func NewRPCClient(dstService string, opts ...client.Option) (RPCClient, error) {
 
 type clientImpl struct {
 	service     string
-	kitexClient userservice.Client
+	kitexClient cartservice.Client
 }
 
 func (c *clientImpl) Service() string {
 	return c.service
 }
 
-func (c *clientImpl) KitexClient() userservice.Client {
+func (c *clientImpl) KitexClient() cartservice.Client {
 	return c.kitexClient
 }
 
-func (c *clientImpl) Register(ctx context.Context, Req *user.RegisterReq, callOptions ...callopt.Option) (r *user.RegisterResp, err error) {
-	return c.kitexClient.Register(ctx, Req, callOptions...)
+func (c *clientImpl) AddItem(ctx context.Context, Req *cart.AddItemReq, callOptions ...callopt.Option) (r *cart.AddItemResp, err error) {
+	return c.kitexClient.AddItem(ctx, Req, callOptions...)
 }
 
-func (c *clientImpl) Login(ctx context.Context, Req *user.LoginReq, callOptions ...callopt.Option) (r *user.LoginResp, err error) {
-	return c.kitexClient.Login(ctx, Req, callOptions...)
+func (c *clientImpl) GetCart(ctx context.Context, Req *cart.GetCartReq, callOptions ...callopt.Option) (r *cart.GetCartResp, err error) {
+	return c.kitexClient.GetCart(ctx, Req, callOptions...)
+}
+
+func (c *clientImpl) EmptyCart(ctx context.Context, Req *cart.EmptyCartReq, callOptions ...callopt.Option) (r *cart.EmptyCartResp, err error) {
+	return c.kitexClient.EmptyCart(ctx, Req, callOptions...)
 }

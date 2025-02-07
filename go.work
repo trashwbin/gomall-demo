@@ -7,4 +7,6 @@ use (
 	hello_world
 	rpc_gen
 	app/user
+	app/product
+	app/cart
 )

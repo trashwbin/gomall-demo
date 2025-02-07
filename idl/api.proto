@@ -46,7 +46,7 @@ extend google.protobuf.MethodOptions {
   optional string name = 50304; // Name of rpc
   optional string api_level = 50305; // Interface Level
   optional string serializer = 50306; // Serialization method
-  optional string param = 50307; // Whether client requests take public parameters
+  optional string param = 50307;      // Whether client requests take public parameters
   optional string baseurl = 50308; // Baseurl used in ttnet routing
   optional string handler_path = 50309; // handler_path specifies the path to generate the method
 
