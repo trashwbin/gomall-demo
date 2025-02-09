@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/order/orderservice"
 	"sync"
 
 	"github.com/cloudwego/kitex/client"
@@ -18,6 +19,7 @@ var (
 	CartClient    cartservice.Client
 	ProductClient productcatalogservice.Client
 	PaymentClient paymentservice.Client
+	OrderClient   orderservice.Client
 	once          sync.Once
 	err           error
 )
@@ -27,6 +29,7 @@ func InitClient() {
 		initCartClient()
 		initProductClient()
 		initPaymentClient()
+		initOrderClient()
 	})
 }
 
@@ -82,6 +85,24 @@ func initPaymentClient() {
 		client.WithMetaHandler(transmeta.ClientHTTP2Handler),
 	)
 	PaymentClient, err = paymentservice.NewClient("payment", opts...)
+	if err != nil {
+		panic(err)
+	}
+}
+func initOrderClient() {
+	var opts []client.Option
+	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
+	if err != nil {
+		panic(err)
+	}
+
+	opts = append(opts, client.WithResolver(r))
+	opts = append(opts,
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: conf.GetConf().Kitex.Service}),
+		client.WithTransportProtocol(transport.GRPC),
+		client.WithMetaHandler(transmeta.ClientHTTP2Handler),
+	)
+	OrderClient, err = orderservice.NewClient("order", opts...)
 	if err != nil {
 		panic(err)
 	}

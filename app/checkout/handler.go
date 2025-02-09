@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/trashwbin/gomall-demo/app/checkout/biz/service"
-	
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/checkout"
 )
 
 // CheckoutServiceImpl implements the last service interface defined in the IDL.

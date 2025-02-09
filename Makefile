@@ -11,7 +11,7 @@ gen-demo-thrift:
 
 .PHONY: gen-frontend-home
 gen-frontend-home:
-	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/checkout_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
+	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/order_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
 .PHONY: gen-frontend-auth
 gen-frontend-auth:
 	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/auth_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
