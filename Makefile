@@ -11,7 +11,7 @@ gen-demo-thrift:
 
 .PHONY: gen-frontend-home
 gen-frontend-home:
-	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/cart_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
+	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/checkout_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
 .PHONY: gen-frontend-auth
 gen-frontend-auth:
 	@cd app/frontend && cwgo server --type HTTP --idl ../../idl/frontend/auth_page.proto --service frontend -module github.com/trashwbin/gomall-demo/app/frontend -I ../../idl
@@ -28,5 +28,5 @@ gen-user-client:
 # 这样做的目的是为了app下所有的微服务不再维护客户端代码，而把客户端代码全部集中在rpc_gen目录下，这样可以更好的维护和管理
 .PHONY: gen-user-server
 gen-user-server:
-	@cd cd app/user && cwgo server --type RPC --service user --module github.com/trashwbin/gomall-demo/app/user --pass "-use github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen" -I ../../idl --idl ../../idl/user.proto
+	@cd app/user && cwgo server --type RPC --service user --module github.com/trashwbin/gomall-demo/app/user --pass "-use github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen" -I ../../idl --idl ../../idl/user.proto
 

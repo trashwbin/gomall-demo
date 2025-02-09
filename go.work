@@ -9,4 +9,6 @@ use (
 	app/user
 	app/product
 	app/cart
+	app/payment
+	app/checkout
 )

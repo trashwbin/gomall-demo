@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart/cartservice"
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/checkout/checkoutservice"
 	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product/productcatalogservice"
 	"sync"
 
@@ -14,9 +15,11 @@ import (
 
 var (
 	// UserClient 是用户服务的RPC客户端实例
-	UserClient    userservice.Client
-	ProductClient productcatalogservice.Client
-	CartClient    cartservice.Client
+	UserClient     userservice.Client
+	ProductClient  productcatalogservice.Client
+	CartClient     cartservice.Client
+	CheckoutClient checkoutservice.Client
+
 	// once 确保InitClient函数只执行一次
 	once sync.Once
 )
@@ -27,6 +30,8 @@ func InitClient() {
 		initUserClient()
 		initCartClient()
 		initProductClient()
+		initCheckoutClient()
+
 	})
 }
 
@@ -55,5 +60,13 @@ func initCartClient() {
 	frontendutils.MustHandleError(err)
 	opts = append(opts, client.WithResolver(r))
 	CartClient, err = cartservice.NewClient("cart", opts...)
+	frontendutils.MustHandleError(err)
+}
+func initCheckoutClient() {
+	var opts []client.Option
+	r, err := consul.NewConsulResolver(conf.GetConf().Hertz.RegistryAddr)
+	frontendutils.MustHandleError(err)
+	opts = append(opts, client.WithResolver(r))
+	CheckoutClient, err = checkoutservice.NewClient("checkout", opts...)
 	frontendutils.MustHandleError(err)
 }
