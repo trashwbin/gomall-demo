@@ -8,7 +8,9 @@ import (
 )
 
 func rootMw() []app.HandlerFunc {
+	// your code...
 	return []app.HandlerFunc{middleware.Auth()}
+
 }
 
 func _addcartitemMw() []app.HandlerFunc {

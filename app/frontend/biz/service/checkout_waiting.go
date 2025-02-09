@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
-	frontendutils "github.com/trashwbin/gomall-demo/app/frontend/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	checkout "github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/checkout"
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/checkout"
+	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
+	frontendutils "github.com/trashwbin/gomall-demo/app/frontend/utils"
 	rpccheckout "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/checkout"
 	rpcpayment "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/payment"
 )
@@ -24,7 +24,7 @@ func NewCheckoutWaitingService(Context context.Context, RequestContext *app.Requ
 func (h *CheckoutWaitingService) Run(req *checkout.CheckoutReq) (resp map[string]any, err error) {
 	userId := frontendutils.GetUserIdFromCtx(h.Context)
 	_, err = rpc.CheckoutClient.Checkout(h.Context, &rpccheckout.CheckoutReq{
-		UserId:    uint32(userId),
+		UserId:    userId,
 		Email:     req.Email,
 		Firstname: req.Firstname,
 		Lastname:  req.Lastname,
@@ -45,6 +45,7 @@ func (h *CheckoutWaitingService) Run(req *checkout.CheckoutReq) (resp map[string
 	if err != nil {
 		return nil, err
 	}
+
 	return utils.H{
 		"title":    "waiting",
 		"redirect": "/checkout/result",

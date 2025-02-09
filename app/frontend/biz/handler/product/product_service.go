@@ -26,8 +26,7 @@ func GetProduct(ctx context.Context, c *app.RequestContext) {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
-
-	c.HTML(consts.StatusOK, "product", resp)
+	c.HTML(consts.StatusOK, "product", utils.WarpResponse(ctx, c, resp))
 }
 
 // SearchProducts .
@@ -42,10 +41,10 @@ func SearchProducts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp, err := service.NewSearchProductsService(ctx, c).Run(&req)
+
 	if err != nil {
 		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
 		return
 	}
-
-	c.HTML(consts.StatusOK, "search", resp)
+	utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
 }

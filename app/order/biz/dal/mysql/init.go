@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/trashwbin/gomall-demo/app/order/biz/model"
 	"github.com/trashwbin/gomall-demo/app/order/conf"
 	"os"
@@ -28,8 +27,9 @@ func Init() {
 		panic(err)
 	}
 	if os.Getenv("GO_ENV") != "online" {
-		if err := DB.AutoMigrate(&model.Order{}, &model.OrderItem{}); err != nil {
-			klog.Error(err)
-		}
+		DB.AutoMigrate( //nolint:errcheck
+			&model.Order{},
+			&model.OrderItem{},
+		)
 	}
 }

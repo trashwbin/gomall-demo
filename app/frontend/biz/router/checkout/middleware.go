@@ -4,18 +4,11 @@ package checkout
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/trashwbin/gomall-demo/app/frontend/middleware"
 )
 
-// rootMw returns a slice containing middleware handlers for the root.
-// This function does not take any parameters.
-// The return value is a slice of app.HandlerFunc, which includes the middleware that needs to be applied to the root route.
 func rootMw() []app.HandlerFunc {
 	// your code...
-	// Here should include the logic to create and return the middleware, but the specific implementation is not given.
-	// For example, it might involve authentication, logging, request validation, etc.
-	// Finally, return a slice containing middleware, such as authentication middleware.
-	return []app.HandlerFunc{middleware.Auth()}
+	return nil
 }
 
 func _checkoutMw() []app.HandlerFunc {

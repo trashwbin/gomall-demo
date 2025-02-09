@@ -2,15 +2,15 @@ package service
 
 import (
 	"context"
+	"strconv"
+
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/checkout"
 	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
 	frontendutils "github.com/trashwbin/gomall-demo/app/frontend/utils"
 	rpccart "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/cart"
 	rpcproduct "github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product"
-	"strconv"
-
-	"github.com/cloudwego/hertz/pkg/app"
-	common "github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/common"
 )
 
 type CheckoutService struct {
@@ -22,20 +22,17 @@ func NewCheckoutService(Context context.Context, RequestContext *app.RequestCont
 	return &CheckoutService{RequestContext: RequestContext, Context: Context}
 }
 
-func (h *CheckoutService) Run(req *common.Empty) (resp map[string]any, err error) {
+func (h *CheckoutService) Run(req *checkout.CheckoutReq) (resp map[string]any, err error) {
 	var items []map[string]string
 	userId := frontendutils.GetUserIdFromCtx(h.Context)
 
-	carts, err := rpc.CartClient.GetCart(h.Context, &rpccart.GetCartReq{UserId: uint32(userId)})
+	carts, err := rpc.CartClient.GetCart(h.Context, &rpccart.GetCartReq{UserId: userId})
 	if err != nil {
 		return nil, err
 	}
 	var total float32
-
-	for _, v := range carts.Items {
-		productResp, err := rpc.ProductClient.GetProduct(h.Context, &rpcproduct.GetProductReq{
-			Id: v.ProductId,
-		})
+	for _, v := range carts.Cart.Items {
+		productResp, err := rpc.ProductClient.GetProduct(h.Context, &rpcproduct.GetProductReq{Id: v.ProductId})
 		if err != nil {
 			return nil, err
 		}
@@ -53,8 +50,9 @@ func (h *CheckoutService) Run(req *common.Empty) (resp map[string]any, err error
 	}
 
 	return utils.H{
-		"title": "Checkout",
-		"items": items,
-		"total": strconv.FormatFloat(float64(total), 'f', 2, 64),
+		"title":    "Checkout",
+		"items":    items,
+		"cart_num": len(items),
+		"total":    strconv.FormatFloat(float64(total), 'f', 2, 64),
 	}, nil
 }

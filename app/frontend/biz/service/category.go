@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/common/utils"
-	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
-	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/utils"
 	category "github.com/trashwbin/gomall-demo/app/frontend/hertz_gen/frontend/category"
+	"github.com/trashwbin/gomall-demo/app/frontend/infra/rpc"
+	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product"
 )
 
 type CategoryService struct {
@@ -20,12 +20,10 @@ func NewCategoryService(Context context.Context, RequestContext *app.RequestCont
 }
 
 func (h *CategoryService) Run(req *category.CategoryReq) (resp map[string]any, err error) {
-	p, err := rpc.ProductClient.ListProducts(h.Context, &product.ListProductsReq{CategoryName: req.Category})
-	if err != nil {
-		return nil, err
-	}
+	p, _ := rpc.ProductClient.ListProducts(h.Context, &product.ListProductsReq{CategoryName: req.Category})
 	return utils.H{
-		"title": "Category",
-		"items": p.Products,
+		"title":    "Category",
+		"items":    p.Products,
+		"cart_num": 10,
 	}, nil
 }

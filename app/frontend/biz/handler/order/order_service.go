@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	hertzUtils "github.com/cloudwego/hertz/pkg/common/utils"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/trashwbin/gomall-demo/app/frontend/biz/service"
 	"github.com/trashwbin/gomall-demo/app/frontend/biz/utils"
@@ -23,9 +24,9 @@ func OrderList(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := service.NewOrderListService(ctx, c).Run(&req)
 	if err != nil {
-		utils.SendErrResponse(ctx, c, consts.StatusOK, err)
+		c.HTML(consts.StatusOK, "order", hertzUtils.H{"error": err})
 		return
 	}
-	c.HTML(consts.StatusOK, "order", utils.WarpResponse(ctx, c, resp))
 
+	c.HTML(consts.StatusOK, "order", utils.WarpResponse(ctx, c, resp))
 }
