@@ -1,14 +1,16 @@
 package email
 
 import (
+	"context"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/server"
 	"github.com/nats-io/nats.go"
 	"github.com/trashwbin/gomall-demo/app/email/infra/mq"
 	"github.com/trashwbin/gomall-demo/app/email/infra/notify"
-	"google.golang.org/protobuf/proto"
-
 	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/email"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"google.golang.org/protobuf/proto"
 )
 
 // ConsumerInit 初始化邮件消费者。
@@ -16,6 +18,9 @@ import (
 // 当接收到消息时，它将消息数据反序列化为邮件请求对象，并使用 noop 邮件发送器发送邮件。
 // 在关闭时，它会取消订阅频道并关闭连接。
 func ConsumerInit() {
+
+	tracer := otel.Tracer("shop-nats-consumer")
+
 	// 订阅 'email' 频道并定义消息处理逻辑
 	sub, err := mq.Nc.Subscribe("email", func(m *nats.Msg) {
 		// 将接收到的消息数据反序列化为邮件请求对象
@@ -24,6 +29,12 @@ func ConsumerInit() {
 		if err != nil {
 			klog.Error(err)
 		}
+
+		ctx := context.Background()
+		ctx = otel.GetTextMapPropagator().Extract(ctx, propagation.HeaderCarrier(m.Header))
+		_, span := tracer.Start(ctx, "shop-email-consumer")
+		defer span.End()
+
 		// 创建一个新的 noop 邮件发送器实例
 		noopEmail := notify.NewNoopEmail()
 		// 使用 noop 邮件发送器发送邮件

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/trashwbin/gomall-demo/app/user/biz/model"
 	"github.com/trashwbin/gomall-demo/app/user/conf"
+	"gorm.io/plugin/opentelemetry/tracing"
 	"os"
 
 	"gorm.io/driver/mysql"
@@ -28,6 +29,9 @@ func Init() {
 		panic(err)
 	}
 
+	if err := DB.Use(tracing.NewPlugin(tracing.WithoutMetrics())); err != nil {
+		panic(err)
+	}
 	// 如果环境不是线上环境，则自动迁移数据库模式以匹配User模型
 	// 这样做是为了在开发和测试环境中保持数据库结构的最新状态
 	if conf.GetConf().Env != "online" {

@@ -4,6 +4,9 @@ package main
 
 import (
 	"context"
+	prometheus "github.com/hertz-contrib/monitor-prometheus"
+	frontendutils "github.com/trashwbin/gomall-demo/app/frontend/utils"
+	"github.com/trashwbin/gomall-demo/common/mtl"
 	"os"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -14,7 +17,7 @@ import (
 	"github.com/hertz-contrib/cors"
 	"github.com/hertz-contrib/gzip"
 	"github.com/hertz-contrib/logger/accesslog"
-	hertzotelprovider "github.com/hertz-contrib/obs-opentelemetry/provider"
+	hertztracing "github.com/hertz-contrib/obs-opentelemetry/tracing"
 	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/sessions"
 	"github.com/hertz-contrib/sessions/redis"
@@ -25,18 +28,31 @@ import (
 	"github.com/trashwbin/gomall-demo/app/frontend/middleware"
 )
 
+var (
+	ServiceName  = frontendutils.ServiceName
+	MetricsPort  = conf.GetConf().Hertz.MetricsPort
+	RegistryAddr = conf.GetConf().Hertz.RegistryAddr
+)
+
 func main() {
 	_ = godotenv.Load()
+	consul, registryInfo := mtl.InitMetric(ServiceName, MetricsPort, RegistryAddr)
+	defer consul.Deregister(registryInfo)
+
 	rpc.InitClient()
 
 	address := conf.GetConf().Hertz.Address
 
-	p := hertzotelprovider.NewOpenTelemetryProvider(
-		hertzotelprovider.WithEnableMetrics(false),
-	)
+	p := mtl.InitTracing(ServiceName)
 	defer p.Shutdown(context.Background())
 
-	h := server.New(server.WithHostPorts(address))
+	tracer, config := hertztracing.NewServerTracer()
+
+	h := server.New(server.WithHostPorts(address),
+		server.WithTracer(prometheus.NewServerTracer("", "", prometheus.WithDisableServer(true), prometheus.WithRegistry(mtl.Registry))),
+		tracer,
+	)
+	h.Use(hertztracing.ServerMiddleware(config))
 	h.LoadHTMLGlob("template/*")
 	h.Delims("{{", "}}")
 	registerMiddleware(h)

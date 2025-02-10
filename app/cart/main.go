@@ -1,15 +1,16 @@
 package main
 
 import (
+	"context"
 	"github.com/joho/godotenv"
-	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/trashwbin/gomall-demo/app/cart/biz/dal"
 	"github.com/trashwbin/gomall-demo/app/cart/infra/rpc"
+	"github.com/trashwbin/gomall-demo/common/mtl"
+	"github.com/trashwbin/gomall-demo/common/serversuite"
 	"net"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
 	"github.com/trashwbin/gomall-demo/app/cart/conf"
@@ -18,8 +19,20 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+var (
+	ServiceName  = conf.GetConf().Kitex.Service
+	RegistryAddr = conf.GetConf().Registry.RegistryAddress[0]
+)
+
 func main() {
 	_ = godotenv.Load()
+	// 初始化 Prometheus 指标服务，配置并启动指标收集和暴露。
+	// - ServiceName: 当前服务的名称，用于标识该服务。
+	// - conf.GetConf().Kitex.MetricsPort: 配置文件中指定的指标服务监听端口。
+	// - RegistryAddr: Consul 注册地址，用于将指标服务注册到 Consul。
+	mtl.InitMetric(ServiceName, conf.GetConf().Kitex.MetricsPort, RegistryAddr)
+	p := mtl.InitTracing(ServiceName)
+	defer p.Shutdown(context.Background())
 	dal.Init()
 	rpc.InitClient()
 	opts := kitexInit()
@@ -40,16 +53,16 @@ func kitexInit() (opts []server.Option) {
 	}
 	opts = append(opts, server.WithServiceAddr(addr))
 
-	// service info
-	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-		ServiceName: conf.GetConf().Kitex.Service,
-	}))
-	// 加载consul注册中心
-	r, err := consul.NewConsulRegister(conf.GetConf().Registry.RegistryAddress[0])
-	if err != nil {
-		klog.Fatal(err)
-	}
-	opts = append(opts, server.WithRegistry(r))
+	// 将 CommonServerSuite 的配置选项添加到服务器选项列表中。
+	// 这里使用了 serversuite.CommonServerSuite 结构体来封装服务的基本配置和选项。
+	opts = append(opts,
+		// 添加一个通用的服务套件，用于配置服务的行为。
+		server.WithSuite(serversuite.CommonServerSuite{
+			CurrentServiceName: ServiceName,  // 当前服务的名称，用于标识该服务
+			RegistryAddr:       RegistryAddr, // Consul 注册地址，用于将服务注册到 Consul
+		}),
+	)
+
 	// klog
 	logger := kitexlogrus.NewLogger()
 	klog.SetLogger(logger)

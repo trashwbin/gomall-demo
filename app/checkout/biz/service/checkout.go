@@ -132,6 +132,7 @@ func (s *CheckoutService) Run(req *checkout.CheckoutReq) (resp *checkout.Checkou
 		Content:     "You just created an order in CloudWeGo shop",
 	})
 	msg := &nats.Msg{Subject: "email", Data: data}
+	//otel.GetTextMapPropagator().Inject(s.ctx, propagation.HeaderCarrier(msg.Header))
 	_ = mq.Nc.PublishMsg(msg)
 
 	klog.Info(paymentResult)

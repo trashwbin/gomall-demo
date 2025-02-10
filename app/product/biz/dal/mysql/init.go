@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/trashwbin/gomall-demo/app/product/biz/model"
 	"github.com/trashwbin/gomall-demo/app/product/conf"
+	"gorm.io/plugin/opentelemetry/tracing"
 	"os"
 
 	"gorm.io/driver/mysql"
@@ -24,6 +25,9 @@ func Init() {
 		},
 	)
 	if err != nil {
+		panic(err)
+	}
+	if err := DB.Use(tracing.NewPlugin(tracing.WithoutMetrics())); err != nil {
 		panic(err)
 	}
 	if os.Getenv("GO_ENV") != "online" {

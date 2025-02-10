@@ -1,10 +1,10 @@
 package rpc
 
 import (
+	"github.com/trashwbin/gomall-demo/common/clientsuite"
 	"sync"
 
 	"github.com/cloudwego/kitex/client"
-	consul "github.com/kitex-contrib/registry-consul"
 	"github.com/trashwbin/gomall-demo/app/cart/conf"
 	cartutils "github.com/trashwbin/gomall-demo/app/cart/utils"
 	"github.com/trashwbin/gomall-demo/rpc_gen/kitex_gen/product/productcatalogservice"
@@ -13,6 +13,9 @@ import (
 var (
 	ProductClient productcatalogservice.Client
 	once          sync.Once
+	ServiceName   = conf.GetConf().Kitex.Service
+	RegistryAddr  = conf.GetConf().Registry.RegistryAddress[0]
+	err           error
 )
 
 func InitClient() {
@@ -22,10 +25,9 @@ func InitClient() {
 }
 
 func initProductClient() {
-	var opts []client.Option
-	r, err := consul.NewConsulResolver(conf.GetConf().Registry.RegistryAddress[0])
-	cartutils.MustHandleError(err)
-	opts = append(opts, client.WithResolver(r))
-	ProductClient, err = productcatalogservice.NewClient("product", opts...)
+	ProductClient, err = productcatalogservice.NewClient("product", client.WithSuite(clientsuite.CommonGrpcClientSuite{
+		CurrentServiceName: ServiceName,
+		RegistryAddr:       RegistryAddr,
+	}))
 	cartutils.MustHandleError(err)
 }

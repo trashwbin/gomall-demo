@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/trashwbin/gomall-demo/app/checkout/conf"
+	"gorm.io/plugin/opentelemetry/tracing"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,6 +20,9 @@ func Init() {
 			SkipDefaultTransaction: true,
 		},
 	)
+	if err := DB.Use(tracing.NewPlugin(tracing.WithoutMetrics())); err != nil {
+		panic(err)
+	}
 	if err != nil {
 		panic(err)
 	}
